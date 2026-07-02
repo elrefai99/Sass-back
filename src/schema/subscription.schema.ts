@@ -10,8 +10,6 @@ const subscriptionSchema = new Schema(
     seats: { type: Number, default: 10 },
     trialEndsAt: { type: Date, default: null },
     currentPeriodEnd: { type: Date, default: null },
-    stripeCustomerId: { type: String, default: null, unique: true, sparse: true },
-    stripeSubscriptionId: { type: String, default: null, unique: true, sparse: true },
   },
   schemaOptions,
 )

@@ -6,7 +6,7 @@ const employeeSchema = new Schema(
   {
     companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
     departmentId: { type: Schema.Types.ObjectId, ref: 'Department', required: true, index: true },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', default: null, unique: true, sparse: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', unique: true, sparse: true },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     phone: { type: String, required: true, trim: true },

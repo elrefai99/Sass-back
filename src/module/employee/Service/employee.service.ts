@@ -73,7 +73,7 @@ export class EmployeeService {
     const employee = await EmployeeModel.create({
       companyId,
       ...dto,
-      userId: linkedUser?._id ?? null,
+      ...(linkedUser ? { userId: linkedUser._id } : {}),
     })
 
     if (linkedUser) {
