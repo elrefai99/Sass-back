@@ -55,6 +55,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
 })
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.get('/api/docs.json', (_req: Request, res: Response) => {
+     res.json(swaggerSpec)
+})
 
 app.get('/metrics', async (req: Request, res: Response) => {
      const metricsToken = process.env.METRICS_TOKEN
