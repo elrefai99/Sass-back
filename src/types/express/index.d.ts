@@ -12,6 +12,7 @@ declare global {
                     name?: string
                     permissions?: string[]
                };
+               validatedQuery?: any;
                lang?: string;
                clientIP?: any;
                useragent?: any

@@ -4,6 +4,6 @@ import { asyncHandler } from '../../../utils/api-requesthandler'
 import { notificationService } from '../Service/notification.service'
 
 export const listNotificationsController: RequestHandler = asyncHandler(async (req, res) => {
-  const result = await notificationService.list(req.user!.id, req.query as any)
+  const result = await notificationService.list(req.user!.id, req.validatedQuery)
   sendSuccess(res, 'Notifications fetched successfully', result.data, 200, result.meta)
 })

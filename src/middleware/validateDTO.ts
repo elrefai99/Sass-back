@@ -19,7 +19,9 @@ export const validateDTO = (schemas: DTOValidation): RequestHandler => {
         req.params = schemas.params.parse(req.params) as typeof req.params
       }
       if (schemas.query) {
-        req.query = schemas.query.parse(req.query) as typeof req.query
+        // Express 5's req.query is a getter-only accessor (no setter) — reassigning it
+        // throws in strict mode. Store the validated/coerced result separately instead.
+        req.validatedQuery = schemas.query.parse(req.query)
       }
       if (schemas.body) {
         req.body = schemas.body.parse(req.body)

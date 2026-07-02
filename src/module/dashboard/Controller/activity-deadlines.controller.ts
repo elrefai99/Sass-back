@@ -4,6 +4,6 @@ import { asyncHandler } from '../../../utils/api-requesthandler'
 import { dashboardService } from '../Service/dashboard.service'
 
 export const activityDeadlinesController: RequestHandler = asyncHandler(async (req, res) => {
-  const data = await dashboardService.activity(req.user!.companyId, req.query as any)
+  const data = await dashboardService.activity(req.user!.companyId, req.validatedQuery)
   sendSuccess(res, 'Dashboard activity fetched successfully', data)
 })

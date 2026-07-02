@@ -4,6 +4,6 @@ import { asyncHandler } from '../../../utils/api-requesthandler'
 import { attendanceService } from '../Service/attendance.service'
 
 export const monthlyReportController: RequestHandler = asyncHandler(async (req, res) => {
-  const data = await attendanceService.monthlyReport(req.user!.companyId, req.user!, req.query as any)
+  const data = await attendanceService.monthlyReport(req.user!.companyId, req.user!, req.validatedQuery)
   sendSuccess(res, 'Monthly attendance report fetched successfully', data)
 })
