@@ -7,6 +7,7 @@ import compression from 'compression'
 import { limiter } from './utils/limit-request'
 import client from 'prom-client'
 import * as useragent from 'express-useragent'
+import { randomUUID } from 'node:crypto'
 
 const register = new client.Registry()
 client.collectDefaultMetrics({ register })
@@ -93,6 +94,9 @@ export default (app: Application) => {
   app.use(useragent.express())
   app.set('trust proxy', 1)
   app.use(async (req: Request | any, res: Response, next: NextFunction) => {
+    req.requestId = req.headers['x-request-id'] || randomUUID()
+    res.setHeader('X-Request-Id', req.requestId)
+
     // get langouage of headers
     req.lang =
       req.headers['accept-language'] === 'ar' ||

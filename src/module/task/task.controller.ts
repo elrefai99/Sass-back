@@ -1,0 +1,6 @@
+export { listTasksController } from './Controller/list-tasks.controller'
+export { getTaskController } from './Controller/get-task.controller'
+export { createTaskController } from './Controller/create-task.controller'
+export { updateTaskController } from './Controller/update-task.controller'
+export { moveTaskController } from './Controller/move-task.controller'
+export { deleteTaskController } from './Controller/delete-task.controller'

@@ -1,0 +1,5 @@
+export { listDepartmentsController } from './Controller/list-departments.controller'
+export { getDepartmentController } from './Controller/get-department.controller'
+export { createDepartmentController } from './Controller/create-department.controller'
+export { updateDepartmentController } from './Controller/update-department.controller'
+export { deleteDepartmentController } from './Controller/delete-department.controller'

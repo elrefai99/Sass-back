@@ -27,5 +27,5 @@ export const loadPubliceKey = (envKey: string): KeyObject => {
 }
 
 export const derivePublicKeyFromPrivate = (envKey: string): KeyObject => {
-     return createPublicKey(loadPrivateKey(envKey))
+     return createPublicKey(loadPrivateKey(envKey) as any)
 }

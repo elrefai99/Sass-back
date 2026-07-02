@@ -63,7 +63,11 @@ app.get('/metrics', async (req: Request, res: Response) => {
 })
 
 app.use(async (_req: Request, res: Response) => {
-     res.status(404).send('This is not the API route you are looking for')
+     res.status(404).json({
+          success: false,
+          code: 'NOT_FOUND',
+          message: 'This is not the API route you are looking for',
+     })
 })
 
 app.use(errorHandler)

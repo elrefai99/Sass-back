@@ -3,5 +3,8 @@
     "./src"
   ],
   "ext": "ts",
-  "exec": "tsx ./src/app.ts"
+  "exec": "node --inspect=9229 -r ts-node/register ./src/app.ts",
+  "env": {
+    "TS_NODE_SOURCE_MAPS": "true"
+  }
 }
