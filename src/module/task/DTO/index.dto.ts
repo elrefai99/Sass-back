@@ -13,6 +13,7 @@ export const listTasksQuerySchema = z.object({
   status: z.enum(TASK_STATUSES).optional(),
   priority: z.enum(TASK_PRIORITIES).optional(),
   assigneeId: z.string().refine(isObjectId, objectIdSchemaMessage).optional(),
+  projectId: z.string().refine(isObjectId, objectIdSchemaMessage).optional(),
   sortBy: z.enum(['dueDate', 'createdAt', 'priority', 'order']).optional().default('order'),
   sortDir: z.enum(['asc', 'desc']).optional().default('asc'),
 })

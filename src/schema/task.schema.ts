@@ -5,6 +5,7 @@ import { schemaOptions } from './options'
 const taskSchema = new Schema(
   {
     companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
+    projectId: { type: Schema.Types.ObjectId, ref: 'Project', default: null, index: true },
     title: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
     status: { type: String, enum: TASK_STATUSES, default: 'todo' },

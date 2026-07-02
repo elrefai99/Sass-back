@@ -10,6 +10,7 @@ declare global {
                     role: SystemRole
                     email?: string
                     name?: string
+                    permissions?: string[]
                };
                lang?: string;
                clientIP?: any;

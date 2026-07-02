@@ -10,7 +10,9 @@ const userSchema = new Schema(
     passwordHash: { type: String, required: true },
     avatarUrl: { type: String, default: null },
     role: { type: String, enum: SYSTEM_ROLES, default: 'employee' },
+    customRoleId: { type: Schema.Types.ObjectId, ref: 'Role', default: null },
     isActive: { type: Boolean, default: true },
+    emailVerifiedAt: { type: Date, default: null },
   },
   schemaOptions,
 )

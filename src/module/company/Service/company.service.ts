@@ -1,4 +1,4 @@
-import { CompanyModel } from '../../../schema'
+import { CompanyModel, RefreshSessionModel, UserModel } from '../../../schema'
 import { idOf } from '../../../shared/document'
 import { writeActivity } from '../../../shared/activity'
 import { AppError } from '../../../utils/errors/app-error'
@@ -32,6 +32,30 @@ export class CompanyService {
     return this.serialize(company)
   }
 
+  async deactivateCompany(companyId: string, actor: { id: string; name?: string }) {
+    const company = await CompanyModel.findByIdAndUpdate(companyId, { isActive: false }, { new: true })
+    if (!company) {
+      throw AppError.notFound('Company not found', 'NOT_FOUND')
+    }
+
+    const users = await UserModel.find({ companyId }).select('_id')
+    await RefreshSessionModel.updateMany(
+      { userId: { $in: users.map((user) => user._id) }, revokedAt: null },
+      { revokedAt: new Date() },
+    )
+
+    await writeActivity({
+      companyId,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: 'company.deactivated',
+      message: 'Company deactivated',
+      entity: `company:${companyId}`,
+    })
+
+    return null
+  }
+
   private serialize(company: any) {
     return {
       id: idOf(company),
@@ -43,6 +67,7 @@ export class CompanyService {
       country: company.country,
       timezone: company.timezone,
       language: company.language,
+      isActive: company.isActive,
       createdAt: company.createdAt,
       onboardedAt: company.onboardedAt,
     }

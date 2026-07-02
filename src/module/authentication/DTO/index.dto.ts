@@ -56,9 +56,25 @@ export const resetPasswordSchema = z
   })
   .strict()
 
+export const acceptInvitationSchema = z
+  .object({
+    token: z.string().min(20),
+    name: z.string().trim().min(2).max(80),
+    password: strongPassword,
+  })
+  .strict()
+
+export const verifyEmailSchema = z
+  .object({
+    token: z.string().min(20),
+  })
+  .strict()
+
 export type RegisterCompanyDTO = z.infer<typeof registerCompanySchema>
 export type LoginDTO = z.infer<typeof loginSchema>
 export type RefreshTokenDTO = z.infer<typeof refreshTokenSchema>
 export type LogoutDTO = z.infer<typeof logoutSchema>
 export type ForgotPasswordDTO = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordDTO = z.infer<typeof resetPasswordSchema>
+export type AcceptInvitationDTO = z.infer<typeof acceptInvitationSchema>
+export type VerifyEmailDTO = z.infer<typeof verifyEmailSchema>

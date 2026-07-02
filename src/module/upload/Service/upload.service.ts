@@ -1,24 +1,25 @@
+import cloudinary from '../../../config/cloudinary'
 import { generateUUID } from '../../../utils/uuid'
 import type { RequestUploadUrlDTO } from '../DTO/index.dto'
 
-const extensionByType: Record<string, string> = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/webp': 'webp',
-  'application/pdf': 'pdf',
-}
-
 export class UploadService {
   requestUploadUrl(companyId: string, dto: RequestUploadUrlDTO) {
-    const extension = extensionByType[dto.contentType]
-    const key = `uploads/${companyId}/${dto.purpose}/${generateUUID()}.${extension}`
-    const baseUrl = process.env.CDN_URL || process.env.API_LINK || 'http://localhost:9999'
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
+    const folder = `${process.env.CLOUDINARY_UPLOAD_FOLDER || 'nexora'}/${companyId}/${dto.purpose}`
+    const publicId = generateUUID()
+    const timestamp = Math.round(Date.now() / 1000)
+    const expiresAt = new Date((timestamp + 5 * 60) * 1000)
+
+    const paramsToSign = { folder, public_id: publicId, timestamp }
+    const signature = cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET as string)
 
     return {
-      uploadUrl: `${baseUrl.replace(/\/$/, '')}/api/v1/uploads/mock-put/${key}`,
-      fileUrl: `${baseUrl.replace(/\/$/, '')}/${key}`,
-      key,
+      uploadUrl: `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/auto/upload`,
+      signature,
+      timestamp,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      folder,
+      publicId,
       contentType: dto.contentType,
       expiresAt,
     }

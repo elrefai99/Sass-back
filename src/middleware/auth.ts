@@ -1,5 +1,5 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
-import { UserModel } from '../schema'
+import { RoleModel, UserModel } from '../schema'
 import { verifyAccessToken } from '../shared/security'
 import { AppError } from '../utils/errors/app-error'
 
@@ -24,10 +24,18 @@ export const auth: RequestHandler = async (req: Request, _res: Response, next: N
     }
 
     const payload = verifyAccessToken(token)
-    const user = await UserModel.findById(payload.sub).select('_id companyId role email name isActive')
+    const user = await UserModel.findById(payload.sub).select(
+      '_id companyId role customRoleId email name isActive',
+    )
 
     if (!user || user.isActive === false) {
       throw AppError.unauthorized('Invalid access token', 'TOKEN_INVALID')
+    }
+
+    let permissions: string[] | undefined
+    if (user.customRoleId) {
+      const role = await RoleModel.findById(user.customRoleId).select('permissionKeys')
+      permissions = role?.permissionKeys ?? []
     }
 
     req.user = {
@@ -36,6 +44,7 @@ export const auth: RequestHandler = async (req: Request, _res: Response, next: N
       role: user.role,
       email: user.email,
       name: user.name,
+      permissions,
     }
 
     next()

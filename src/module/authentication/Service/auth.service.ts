@@ -3,6 +3,8 @@ import { generateUUID } from '../../../utils/uuid'
 import {
   CompanyModel,
   DepartmentModel,
+  EmailVerificationTokenModel,
+  InvitationModel,
   PasswordResetTokenModel,
   RefreshSessionModel,
   SubscriptionModel,
@@ -13,13 +15,16 @@ import { AppError } from '../../../utils/errors/app-error'
 import { addDays, createOpaqueToken, hashToken, signAccessToken } from '../../../shared/security'
 import { plans } from '../../../shared/plans'
 import { idOf } from '../../../shared/document'
+import { writeActivity } from '../../../shared/activity'
 import type {
+  AcceptInvitationDTO,
   ForgotPasswordDTO,
   LoginDTO,
   LogoutDTO,
   RefreshTokenDTO,
   RegisterCompanyDTO,
   ResetPasswordDTO,
+  VerifyEmailDTO,
 } from '../DTO/index.dto'
 import type { SessionClient } from '../@types'
 
@@ -87,6 +92,16 @@ export class AuthenticationService {
       name: user.name,
       company: company.name,
     })
+    await this.sendVerificationEmail(user)
+
+    await writeActivity({
+      companyId: idOf(company),
+      actorId: idOf(user),
+      actorName: user.name,
+      action: 'auth.company_registered',
+      message: `${company.name} registered by ${user.name}`,
+      entity: `company:${idOf(company)}`,
+    })
 
     return {
       ...this.sessionContext(user, company, subscription),
@@ -120,6 +135,14 @@ export class AuthenticationService {
 
     const tokens = await this.createSession(user, client)
     await this.queueEmail('login', user.email, 'New login to Nexora ERP', { name: user.name })
+    await writeActivity({
+      companyId: user.companyId.toString(),
+      actorId: idOf(user),
+      actorName: user.name,
+      action: 'auth.login',
+      message: `${user.name} logged in`,
+      entity: `user:${idOf(user)}`,
+    })
 
     return {
       ...this.sessionContext(user, company, subscription),
@@ -137,6 +160,17 @@ export class AuthenticationService {
 
     if (session.revokedAt) {
       await RefreshSessionModel.updateMany({ familyId: session.familyId }, { revokedAt: new Date() })
+      const reusedBy = await UserModel.findById(session.userId).select('companyId name')
+      if (reusedBy) {
+        await writeActivity({
+          companyId: reusedBy.companyId.toString(),
+          actorId: session.userId.toString(),
+          actorName: reusedBy.name,
+          action: 'auth.refresh_token_reuse_detected',
+          message: `Refresh token reuse detected for ${reusedBy.name}; session family revoked`,
+          entity: `user:${session.userId.toString()}`,
+        })
+      }
       throw AppError.unauthorized('Refresh token invalid', 'TOKEN_INVALID')
     }
 
@@ -156,7 +190,7 @@ export class AuthenticationService {
     return this.createSession(user, client, session.familyId)
   }
 
-  async logout(dto: LogoutDTO) {
+  async logout(dto: LogoutDTO, actor?: { id: string; companyId: string; name?: string }) {
     if (!dto.refreshToken) {
       return null
     }
@@ -165,6 +199,17 @@ export class AuthenticationService {
       { tokenHash: hashToken(dto.refreshToken), revokedAt: null },
       { revokedAt: new Date() },
     )
+
+    if (actor) {
+      await writeActivity({
+        companyId: actor.companyId,
+        actorId: actor.id,
+        actorName: actor.name,
+        action: 'auth.logout',
+        message: `${actor.name ?? 'User'} logged out`,
+        entity: `user:${actor.id}`,
+      })
+    }
 
     return null
   }
@@ -205,12 +250,133 @@ export class AuthenticationService {
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12)
-    await UserModel.updateOne({ _id: resetToken.userId }, { passwordHash })
+    const user = await UserModel.findByIdAndUpdate(resetToken.userId, { passwordHash })
     resetToken.usedAt = new Date()
     await resetToken.save()
     await RefreshSessionModel.updateMany({ userId: resetToken.userId, revokedAt: null }, { revokedAt: new Date() })
 
+    if (user) {
+      await writeActivity({
+        companyId: user.companyId.toString(),
+        actorId: idOf(user),
+        actorName: user.name,
+        action: 'auth.password_reset',
+        message: `${user.name} reset their password`,
+        entity: `user:${idOf(user)}`,
+      })
+    }
+
     return null
+  }
+
+  async acceptInvitation(dto: AcceptInvitationDTO, client: SessionClient) {
+    const invitation = await InvitationModel.findOne({
+      tokenHash: hashToken(dto.token),
+      status: 'pending',
+    })
+
+    if (!invitation) {
+      throw AppError.unauthorized('Invitation invalid', 'TOKEN_INVALID')
+    }
+
+    if (invitation.expiresAt.getTime() <= Date.now()) {
+      throw AppError.unauthorized('Invitation expired', 'TOKEN_EXPIRED')
+    }
+
+    const existing = await UserModel.exists({ email: invitation.email })
+    if (existing) {
+      throw AppError.conflict('Email already registered', 'CONFLICT')
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 12)
+    const user = await UserModel.create({
+      companyId: invitation.companyId,
+      name: dto.name,
+      email: invitation.email,
+      passwordHash,
+      role: invitation.role,
+    })
+
+    invitation.status = 'accepted'
+    await invitation.save()
+
+    const [company, subscription] = await Promise.all([
+      CompanyModel.findById(invitation.companyId),
+      SubscriptionModel.findOne({ companyId: invitation.companyId }),
+    ])
+
+    if (!company || !subscription) {
+      throw AppError.unauthorized('Invalid session context', 'TOKEN_INVALID')
+    }
+
+    const tokens = await this.createSession(user, client)
+    await this.queueEmail('register', user.email, 'Welcome to Nexora ERP', {
+      name: user.name,
+      company: company.name,
+    })
+    await this.sendVerificationEmail(user)
+
+    await writeActivity({
+      companyId: idOf(company),
+      actorId: idOf(user),
+      actorName: user.name,
+      action: 'auth.invitation_accepted',
+      message: `${user.name} accepted an invitation and joined ${company.name}`,
+      entity: `user:${idOf(user)}`,
+    })
+
+    return {
+      ...this.sessionContext(user, company, subscription),
+      ...tokens,
+    }
+  }
+
+  async verifyEmail(dto: VerifyEmailDTO) {
+    const verificationToken = await EmailVerificationTokenModel.findOne({
+      tokenHash: hashToken(dto.token),
+      usedAt: null,
+    })
+
+    if (!verificationToken) {
+      throw AppError.unauthorized('Verification token invalid', 'TOKEN_INVALID')
+    }
+
+    if (verificationToken.expiresAt.getTime() <= Date.now()) {
+      throw AppError.unauthorized('Verification token expired', 'TOKEN_EXPIRED')
+    }
+
+    const user = await UserModel.findByIdAndUpdate(verificationToken.userId, { emailVerifiedAt: new Date() })
+    verificationToken.usedAt = new Date()
+    await verificationToken.save()
+
+    if (user) {
+      await writeActivity({
+        companyId: user.companyId.toString(),
+        actorId: idOf(user),
+        actorName: user.name,
+        action: 'auth.email_verified',
+        message: `${user.name} verified their email`,
+        entity: `user:${idOf(user)}`,
+      })
+    }
+
+    return null
+  }
+
+  private async sendVerificationEmail(user: any) {
+    const token = createOpaqueToken()
+    await EmailVerificationTokenModel.create({
+      userId: user._id,
+      tokenHash: hashToken(token),
+      expiresAt: addDays(new Date(), 3),
+    })
+
+    const siteUrl = process.env.SITE_URL_LIVE || process.env.SITE_URL_TEST || process.env.API_LINK || ''
+    await this.queueEmail('verifyEmail', user.email, 'Verify your Nexora ERP email', {
+      firstName: user.name,
+      expiresIn: '3 days',
+      verifyUrl: `${siteUrl.replace(/\/$/, '')}/verify-email?token=${token}`,
+    })
   }
 
   async me(userId: string) {

@@ -4,7 +4,7 @@ import { hasRole, type SystemRole } from '../../../shared/enums'
 import { idOf } from '../../../shared/document'
 import { writeActivity } from '../../../shared/activity'
 import { AppError } from '../../../utils/errors/app-error'
-import type { AttendanceHistoryQueryDTO } from '../DTO/index.dto'
+import type { AttendanceHistoryQueryDTO, MonthlyReportQueryDTO } from '../DTO/index.dto'
 
 export class AttendanceService {
   async today(companyId: string, actor: { id: string; role: SystemRole }) {
@@ -113,6 +113,52 @@ export class AttendanceService {
       data: records.map((record) => this.serialize(record)),
       meta: buildMeta(page, pageSize, total),
     }
+  }
+
+  async monthlyReport(companyId: string, actor: { id: string; role: SystemRole }, query: MonthlyReportQueryDTO) {
+    const from = new Date(Date.UTC(query.year, query.month - 1, 1))
+    const to = new Date(Date.UTC(query.year, query.month, 1))
+
+    let employeeId: string | undefined = query.employeeId
+    if (employeeId && hasRole(actor.role, 'manager')) {
+      const employee = await EmployeeModel.exists({ _id: employeeId, companyId, deletedAt: null })
+      if (!employee) throw AppError.notFound('Employee not found', 'NOT_FOUND')
+    } else if (!hasRole(actor.role, 'manager')) {
+      const employee = await this.currentEmployee(companyId, actor.id)
+      employeeId = employee._id.toString()
+    }
+
+    const match: Record<string, unknown> = { companyId, date: { $gte: from, $lt: to } }
+    if (employeeId) match.employeeId = employeeId
+
+    const rows = await AttendanceRecordModel.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: '$employeeId',
+          daysPresent: { $sum: { $cond: [{ $eq: ['$status', 'present'] }, 1, 0] } },
+          daysLate: { $sum: { $cond: [{ $eq: ['$status', 'late'] }, 1, 0] } },
+          daysAbsent: { $sum: { $cond: [{ $eq: ['$status', 'absent'] }, 1, 0] } },
+          daysOnLeave: { $sum: { $cond: [{ $eq: ['$status', 'on_leave'] }, 1, 0] } },
+          totalWorkedHours: { $sum: { $ifNull: ['$workedHours', 0] } },
+        },
+      },
+    ])
+
+    const employees = await EmployeeModel.find({ _id: { $in: rows.map((row) => row._id) } }).select('name email')
+    const employeeById = new Map(employees.map((employee) => [employee._id.toString(), employee]))
+
+    return rows.map((row) => ({
+      employeeId: row._id.toString(),
+      employeeName: employeeById.get(row._id.toString())?.name ?? null,
+      month: query.month,
+      year: query.year,
+      daysPresent: row.daysPresent,
+      daysLate: row.daysLate,
+      daysAbsent: row.daysAbsent,
+      daysOnLeave: row.daysOnLeave,
+      totalWorkedHours: Number(row.totalWorkedHours.toFixed(1)),
+    }))
   }
 
   private async currentEmployee(companyId: string, userId: string) {

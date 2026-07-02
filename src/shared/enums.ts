@@ -53,6 +53,9 @@ export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
 export const INVITATION_STATUSES = ['pending', 'accepted', 'expired', 'revoked'] as const
 export type InvitationStatus = (typeof INVITATION_STATUSES)[number]
 
+export const PROJECT_STATUSES = ['planning', 'active', 'on_hold', 'completed', 'archived'] as const
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number]
+
 export const roleRank: Record<SystemRole, number> = {
   employee: 1,
   manager: 2,

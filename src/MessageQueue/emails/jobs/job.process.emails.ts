@@ -5,6 +5,7 @@ import { resendFunction } from "../../../MessageQueue/provider/resend";
 import { generateUUID } from "../../../utils/uuid";
 import { inviteTemp } from "../template/invite";
 import { forgetPasswordTemp } from "../template/forgetPassword";
+import { verifyEmailTemp } from "../template/verifyEmail";
 
 export const sendEmail = async (data: any) => {
      try {
@@ -23,6 +24,9 @@ export const sendEmail = async (data: any) => {
                     break;
                case "forgatePassword":
                     await resendFunction(data.email, forgetPasswordTemp(data.emailBody), data.subject, uuid, "auth")
+                    break;
+               case "verifyEmail":
+                    await resendFunction(data.email, verifyEmailTemp(data.emailBody), data.subject, uuid, "auth")
                     break;
           }
      }

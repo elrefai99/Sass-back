@@ -14,6 +14,7 @@ export class TaskService {
     if (query.status) filter.status = query.status
     if (query.priority) filter.priority = query.priority
     if (query.assigneeId) filter.assigneeId = query.assigneeId
+    if (query.projectId) filter.projectId = query.projectId
     if (query.search) filter.title = { $regex: query.search, $options: 'i' }
 
     const sort: Record<string, 1 | -1> = {

@@ -26,12 +26,14 @@ process
 import express, { type Express, type Request, type Response } from 'express'
 import client from 'prom-client'
 import * as http from 'http'
+import swaggerUi from 'swagger-ui-express'
 import { Server as SocketIOServer } from 'socket.io'
 import { allowedOrigins } from './app.config'
 import appConfig from './app.config'
 import appModule from './app.module'
 import { redisConfig } from './config/redis'
 import { mongoDBConfig } from './config/mongoDB'
+import { swaggerSpec } from './config/swagger'
 import { errorHandler } from './utils/errors/errorHandler'
 
 const app: Express = express()
@@ -51,6 +53,8 @@ appModule(app)
 app.get('/api/health', (_req: Request, res: Response) => {
      res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
 })
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.get('/metrics', async (req: Request, res: Response) => {
      const metricsToken = process.env.METRICS_TOKEN

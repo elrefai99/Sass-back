@@ -14,6 +14,7 @@ const companySchema = new Schema(
     language: { type: String, enum: LANGUAGES, default: 'en' },
     workdayStart: { type: String, default: '09:00' },
     onboardedAt: { type: Date, default: null },
+    isActive: { type: Boolean, default: true },
   },
   schemaOptions,
 )

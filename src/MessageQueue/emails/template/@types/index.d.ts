@@ -25,6 +25,13 @@ export interface IPayload_forgetPassword {
      public readonly uuid?: string
 }
 
+export interface IPayload_verifyEmail {
+     public readonly verifyUrl: string
+     public readonly expiresIn: string
+     public readonly firstName?: string
+     public readonly uuid?: string
+}
+
 export interface IPayload_invite {
      public readonly firstName: string,
      public readonly inviterName: string,

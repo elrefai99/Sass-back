@@ -1,0 +1,5 @@
+export { listProjectsController } from './Controller/list-projects.controller'
+export { getProjectController } from './Controller/get-project.controller'
+export { createProjectController } from './Controller/create-project.controller'
+export { updateProjectController } from './Controller/update-project.controller'
+export { deleteProjectController } from './Controller/delete-project.controller'
