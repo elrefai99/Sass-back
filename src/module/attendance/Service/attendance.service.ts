@@ -3,6 +3,7 @@ import { buildMeta, parsePagination } from '../../../shared/pagination'
 import { hasRole, type SystemRole } from '../../../shared/enums'
 import { idOf } from '../../../shared/document'
 import { writeActivity } from '../../../shared/activity'
+import { ensureEmployeeProfile } from '../../../shared/ensure-employee'
 import { AppError } from '../../../utils/errors/app-error'
 import type { AttendanceHistoryQueryDTO, MonthlyReportQueryDTO } from '../DTO/index.dto'
 
@@ -162,7 +163,10 @@ export class AttendanceService {
   }
 
   private async currentEmployee(companyId: string, userId: string) {
-    const employee = await EmployeeModel.findOne({ companyId, userId, deletedAt: null })
+    // Self-heal: accounts created before employee auto-provisioning (e.g. the
+    // company owner, or users who joined via invitation) may not have an
+    // employee record yet. Create one on demand so attendance works for all.
+    const employee = await ensureEmployeeProfile(companyId, userId)
     if (!employee) {
       throw AppError.notFound('Employee profile not found', 'NOT_FOUND')
     }

@@ -15,6 +15,7 @@ import { AppError } from '../../../utils/errors/app-error'
 import { addDays, createOpaqueToken, hashToken, signAccessToken } from '../../../shared/security'
 import { plans } from '../../../shared/plans'
 import { idOf } from '../../../shared/document'
+import { ensureEmployeeProfile } from '../../../shared/ensure-employee'
 import { writeActivity } from '../../../shared/activity'
 import type {
   AcceptInvitationDTO,
@@ -76,6 +77,10 @@ export class AuthenticationService {
         isDefault: true,
       })),
     )
+
+    // Give the owner an employee profile so self-service features (attendance,
+    // assignment, etc.) work for them just like any other team member.
+    await ensureEmployeeProfile(idOf(company), idOf(user))
 
     const subscription = await SubscriptionModel.create({
       companyId: company._id,
@@ -308,6 +313,9 @@ export class AuthenticationService {
 
     invitation.status = 'accepted'
     await invitation.save()
+
+    // Ensure the newly-joined user has an employee profile.
+    await ensureEmployeeProfile(invitation.companyId.toString(), idOf(user))
 
     const [company, subscription] = await Promise.all([
       CompanyModel.findById(invitation.companyId),
