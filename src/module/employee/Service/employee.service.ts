@@ -1,10 +1,13 @@
-import { DepartmentModel, EmployeeModel, SubscriptionModel, UserModel } from '../../../schema'
+import * as bcrypt from 'bcryptjs'
+import { CompanyModel, DepartmentModel, EmployeeModel, SubscriptionModel, UserModel } from '../../../schema'
+import { addJobToQueue } from '../../../MessageQueue/emails/Queue/queue.email'
 import { buildMeta, parsePagination } from '../../../shared/pagination'
 import { getPlanSeatLimit } from '../../../shared/plans'
 import { hasRole, type SystemRole } from '../../../shared/enums'
 import { idOf } from '../../../shared/document'
 import { writeActivity } from '../../../shared/activity'
 import { AppError } from '../../../utils/errors/app-error'
+import { generateTemporaryPassword } from '../../../utils/password'
 import type { CreateEmployeeDTO, ListEmployeesQueryDTO, UpdateEmployeeDTO } from '../DTO/index.dto'
 
 export class EmployeeService {
@@ -69,16 +72,34 @@ export class EmployeeService {
       throw AppError.conflict('Employee email already exists', 'CONFLICT')
     }
 
-    const linkedUser = await UserModel.findOne({ companyId, email: dto.email })
+    let linkedUser = await UserModel.findOne({ companyId, email: dto.email })
+
+    // Freshly-added employees have no account yet: provision one with a
+    // temporary password so they can sign in, and email them the credentials.
+    let temporaryPassword: string | null = null
+    if (!linkedUser) {
+      temporaryPassword = generateTemporaryPassword()
+      const passwordHash = await bcrypt.hash(temporaryPassword, 12)
+      linkedUser = await UserModel.create({
+        companyId,
+        name: dto.name,
+        email: dto.email,
+        passwordHash,
+        role: dto.systemRole,
+      })
+    } else {
+      linkedUser.role = dto.systemRole
+      await linkedUser.save()
+    }
+
     const employee = await EmployeeModel.create({
       companyId,
       ...dto,
-      ...(linkedUser ? { userId: linkedUser._id } : {}),
+      userId: linkedUser._id,
     })
 
-    if (linkedUser) {
-      linkedUser.role = dto.systemRole
-      await linkedUser.save()
+    if (temporaryPassword) {
+      await this.sendCredentialsEmail(companyId, employee, temporaryPassword)
     }
 
     await writeActivity({
@@ -156,6 +177,30 @@ export class EmployeeService {
     })
 
     return null
+  }
+
+  private async sendCredentialsEmail(companyId: string, employee: any, password: string) {
+    const company = await CompanyModel.findById(companyId).select('name')
+    const siteUrl = process.env.SITE_URL_LIVE || process.env.SITE_URL_TEST || process.env.API_LINK || ''
+    const loginUrl = `${siteUrl.replace(/\/$/, '')}/login`
+
+    try {
+      await addJobToQueue('sendEmail', {
+        type: 'newEmployee',
+        email: employee.email,
+        subject: 'Your SRVJ account is ready',
+        emailBody: {
+          firstName: employee.name,
+          companyName: company?.name,
+          email: employee.email,
+          password,
+          role: employee.role,
+          loginUrl,
+        },
+      })
+    } catch {
+      // Email queues should not break employee creation.
+    }
   }
 
   private async assertSeatAvailable(companyId: string) {

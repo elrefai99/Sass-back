@@ -6,6 +6,7 @@ import { generateUUID } from "../../../utils/uuid";
 import { inviteTemp } from "../template/invite";
 import { forgetPasswordTemp } from "../template/forgetPassword";
 import { verifyEmailTemp } from "../template/verifyEmail";
+import { newEmployeeTemp } from "../template/newEmployee";
 
 export const sendEmail = async (data: any) => {
      try {
@@ -27,6 +28,9 @@ export const sendEmail = async (data: any) => {
                     break;
                case "verifyEmail":
                     await resendFunction(data.email, verifyEmailTemp(data.emailBody), data.subject, uuid, "auth")
+                    break;
+               case "newEmployee":
+                    await resendFunction(data.email, newEmployeeTemp(data.emailBody), data.subject, uuid, "user")
                     break;
           }
      }

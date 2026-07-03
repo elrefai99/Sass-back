@@ -42,3 +42,13 @@ export interface IPayload_invite {
      public readonly acceptUrl: string
      public readonly uuid?: string
 }
+
+export interface IPayload_newEmployee {
+     public readonly firstName: string,
+     public readonly companyName?: string,
+     public readonly email: string,
+     public readonly password: string,
+     public readonly role?: string,
+     public readonly loginUrl: string
+     public readonly uuid?: string
+}
