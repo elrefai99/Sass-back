@@ -152,25 +152,20 @@ export class AuthenticationService {
 
   async refresh(dto: RefreshTokenDTO, client: SessionClient) {
     const tokenHash = hashToken(dto.refreshToken)
-    const session = await RefreshSessionModel.findOne({ tokenHash })
+
+    // Atomically claim the token: the `{ revokedAt: null }` filter guarantees
+    // that only one concurrent request can flip it, eliminating the rotation
+    // race. Returns the pre-update document (revokedAt still null as it was).
+    const session = await RefreshSessionModel.findOneAndUpdate(
+      { tokenHash, revokedAt: null },
+      { revokedAt: new Date(), lastUsedAt: new Date() },
+      { new: false },
+    )
 
     if (!session) {
-      throw AppError.unauthorized('Refresh token invalid', 'TOKEN_INVALID')
-    }
-
-    if (session.revokedAt) {
-      await RefreshSessionModel.updateMany({ familyId: session.familyId }, { revokedAt: new Date() })
-      const reusedBy = await UserModel.findById(session.userId).select('companyId name')
-      if (reusedBy) {
-        await writeActivity({
-          companyId: reusedBy.companyId.toString(),
-          actorId: session.userId.toString(),
-          actorName: reusedBy.name,
-          action: 'auth.refresh_token_reuse_detected',
-          message: `Refresh token reuse detected for ${reusedBy.name}; session family revoked`,
-          entity: `user:${session.userId.toString()}`,
-        })
-      }
+      // No live session for this hash. If a (revoked) row exists, the token was
+      // already rotated — treat as reuse and revoke the whole family.
+      await this.handlePossibleReuse(tokenHash)
       throw AppError.unauthorized('Refresh token invalid', 'TOKEN_INVALID')
     }
 
@@ -183,11 +178,25 @@ export class AuthenticationService {
       throw AppError.unauthorized('Refresh token invalid', 'TOKEN_INVALID')
     }
 
-    session.revokedAt = new Date()
-    session.lastUsedAt = new Date()
-    await session.save()
-
     return this.createSession(user, client, session.familyId)
+  }
+
+  private async handlePossibleReuse(tokenHash: string) {
+    const reused = await RefreshSessionModel.findOne({ tokenHash })
+    if (!reused) return
+
+    await RefreshSessionModel.updateMany({ familyId: reused.familyId }, { revokedAt: new Date() })
+    const owner = await UserModel.findById(reused.userId).select('companyId name')
+    if (owner) {
+      await writeActivity({
+        companyId: owner.companyId.toString(),
+        actorId: reused.userId.toString(),
+        actorName: owner.name,
+        action: 'auth.refresh_token_reuse_detected',
+        message: `Refresh token reuse detected for ${owner.name}; session family revoked`,
+        entity: `user:${reused.userId.toString()}`,
+      })
+    }
   }
 
   async logout(dto: LogoutDTO, actor?: { id: string; companyId: string; name?: string }) {

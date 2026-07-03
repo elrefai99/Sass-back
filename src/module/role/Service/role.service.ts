@@ -3,9 +3,12 @@ import { idOf } from '../../../shared/document'
 import { buildSearchFilter } from '../../../shared/filter'
 import { writeActivity } from '../../../shared/activity'
 import { SYSTEM_ROLES } from '../../../shared/enums'
+import { assertCanGrantPermissions, type Actor } from '../../../shared/authz'
 import { AppError } from '../../../utils/errors/app-error'
 import { SYSTEM_ROLE_DEFAULT_PERMISSIONS } from '../../permission/utils/catalog'
 import type { CreateRoleDTO, ListRolesQueryDTO, UpdateRoleDTO } from '../DTO/index.dto'
+
+type RoleActor = Actor & { name?: string }
 
 export class RoleService {
   async ensureSystemRoles(companyId: string) {
@@ -47,7 +50,9 @@ export class RoleService {
     return this.serialize(role)
   }
 
-  async create(companyId: string, actor: { id: string; name?: string }, dto: CreateRoleDTO) {
+  async create(companyId: string, actor: RoleActor, dto: CreateRoleDTO) {
+    // An actor cannot mint a role carrying permissions they do not themselves hold.
+    assertCanGrantPermissions(actor, dto.permissionKeys)
     const key = dto.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')
     const role = await RoleModel.create({
       companyId,
@@ -70,7 +75,9 @@ export class RoleService {
     return this.serialize(role)
   }
 
-  async update(companyId: string, actor: { id: string; name?: string }, roleId: string, dto: UpdateRoleDTO) {
+  async update(companyId: string, actor: RoleActor, roleId: string, dto: UpdateRoleDTO) {
+    // An actor cannot add permissions they do not themselves hold.
+    assertCanGrantPermissions(actor, dto.permissionKeys)
     const role = await RoleModel.findOne({ _id: roleId, companyId })
     if (!role) {
       throw AppError.notFound('Role not found', 'NOT_FOUND')

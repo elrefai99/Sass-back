@@ -10,11 +10,15 @@ import {
 import { writeActivity } from '../../../shared/activity'
 import { addDays, createOpaqueToken, hashToken } from '../../../shared/security'
 import { getPlanSeatLimit } from '../../../shared/plans'
+import { assertCanAssignRole } from '../../../shared/authz'
+import type { SystemRole } from '../../../shared/enums'
 import { AppError } from '../../../utils/errors/app-error'
 import type { CompleteOnboardingDTO, InviteEmployeesDTO } from '../DTO/index.dto'
 
+type OnboardingActor = { id: string; name?: string; role: SystemRole }
+
 export class OnboardingService {
-  async completeOnboarding(companyId: string, actor: { id: string; name?: string }, dto: CompleteOnboardingDTO) {
+  async completeOnboarding(companyId: string, actor: OnboardingActor, dto: CompleteOnboardingDTO) {
     const company = await CompanyModel.findById(companyId)
     if (!company) {
       throw AppError.notFound('Company not found', 'NOT_FOUND')
@@ -64,7 +68,9 @@ export class OnboardingService {
     }
   }
 
-  async inviteEmployees(companyId: string, actor: { id: string; name?: string }, dto: InviteEmployeesDTO) {
+  async inviteEmployees(companyId: string, actor: OnboardingActor, dto: InviteEmployeesDTO) {
+    // An invitation may not grant a role at or above the inviter's own level.
+    assertCanAssignRole(actor.role, dto.role)
     const subscription = await SubscriptionModel.findOne({ companyId })
     if (!subscription) {
       throw AppError.forbidden('Plan required', 'PLAN_REQUIRED')

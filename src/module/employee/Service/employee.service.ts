@@ -4,6 +4,7 @@ import { addJobToQueue } from '../../../MessageQueue/emails/Queue/queue.email'
 import { buildMeta, parsePagination } from '../../../shared/pagination'
 import { getPlanSeatLimit } from '../../../shared/plans'
 import { hasRole, type SystemRole } from '../../../shared/enums'
+import { assertCanAssignRole } from '../../../shared/authz'
 import { idOf } from '../../../shared/document'
 import { writeActivity } from '../../../shared/activity'
 import { AppError } from '../../../utils/errors/app-error'
@@ -64,6 +65,8 @@ export class EmployeeService {
   }
 
   async create(companyId: string, actor: { id: string; name?: string; role: SystemRole }, dto: CreateEmployeeDTO) {
+    // A newly-provisioned account may never be granted a role at or above the actor's own.
+    assertCanAssignRole(actor.role, dto.systemRole)
     await this.assertSeatAvailable(companyId)
     await this.assertDepartment(companyId, dto.departmentId)
 
@@ -125,9 +128,13 @@ export class EmployeeService {
     }
 
     const update = { ...dto }
-    if (actor.role === 'manager') {
+    // Only admins and above may change compensation.
+    if (!hasRole(actor.role, 'admin')) {
       delete update.salary
-      delete update.systemRole
+    }
+    // Role changes are capped by the actor's own rank.
+    if (update.systemRole !== undefined) {
+      assertCanAssignRole(actor.role, update.systemRole)
     }
 
     const employee = await EmployeeModel.findOneAndUpdate(

@@ -1,5 +1,8 @@
 import './config/dotenv'
+import { validateEnv } from './config/validateEnv'
 import { logger } from './utils/logger'
+
+validateEnv()
 process
      .on('unhandledRejection', (reason, promise) => {
           console.error(reason, 'Unhandled Rejection at Promise', promise)

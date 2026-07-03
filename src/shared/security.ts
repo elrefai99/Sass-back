@@ -14,11 +14,14 @@ export const hashToken = (token: string): string => crypto.createHash('sha256').
 
 export const createOpaqueToken = (): string => crypto.randomBytes(32).toString('hex')
 
-const getAccessSecret = (): string =>
-  process.env.JWT_ACCESS_SECRET ||
-  process.env.API_KEY_SALT ||
-  process.env.ACCESS_PRIVATE_KEY ||
-  'development-access-secret'
+const getAccessSecret = (): string => {
+  const secret = process.env.JWT_ACCESS_SECRET
+  if (secret) return secret
+  // Never fall back to a hardcoded secret in a real environment: an attacker
+  // who knows it can forge tokens for any user/tenant. Only tests get a stub.
+  if (process.env.NODE_ENV === 'test') return 'test-only-access-secret'
+  throw new Error('JWT_ACCESS_SECRET is not set — refusing to sign/verify tokens with a default secret')
+}
 
 export const signAccessToken = (payload: Omit<AccessTokenPayload, 'jti'>): string =>
   jwt.sign(

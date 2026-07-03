@@ -1,10 +1,14 @@
-import { RefreshSessionModel, UserModel } from '../../../schema'
+import { RefreshSessionModel, RoleModel, UserModel } from '../../../schema'
 import { idOf } from '../../../shared/document'
 import { writeActivity } from '../../../shared/activity'
 import { buildMeta, parsePagination } from '../../../shared/pagination'
 import { buildSearchFilter } from '../../../shared/filter'
+import { assertCanActOnUserRole, assertCanAssignRole } from '../../../shared/authz'
+import type { SystemRole } from '../../../shared/enums'
 import { AppError } from '../../../utils/errors/app-error'
 import type { ListUsersQueryDTO, UpdateUserDTO } from '../DTO/index.dto'
+
+type UserActor = { id: string; name?: string; role: SystemRole }
 
 export class UserService {
   async list(companyId: string, query: ListUsersQueryDTO) {
@@ -36,18 +40,27 @@ export class UserService {
     return this.serialize(user)
   }
 
-  async update(companyId: string, actor: { id: string; name?: string }, userId: string, dto: UpdateUserDTO) {
+  async update(companyId: string, actor: UserActor, userId: string, dto: UpdateUserDTO) {
     const user = await UserModel.findOne({ _id: userId, companyId })
     if (!user) {
       throw AppError.notFound('User not found', 'NOT_FOUND')
     }
 
-    if (user.role === 'owner') {
-      throw AppError.forbidden('Cannot modify the company owner via this endpoint', 'FORBIDDEN')
+    // Actors may only act on users strictly below their own rank (blocks an
+    // admin from modifying a peer admin or the owner).
+    assertCanActOnUserRole(actor.role, user.role)
+
+    // A new role may not be at or above the actor's own level.
+    if (dto.role !== undefined) {
+      assertCanAssignRole(actor.role, dto.role)
     }
 
-    if (dto.role === 'owner') {
-      throw AppError.forbidden('Cannot modify the company owner via this endpoint', 'FORBIDDEN')
+    // A custom role must belong to this company (blocks cross-tenant role reuse).
+    if (dto.customRoleId) {
+      const roleExists = await RoleModel.exists({ _id: dto.customRoleId, companyId })
+      if (!roleExists) {
+        throw AppError.notFound('Role not found', 'NOT_FOUND')
+      }
     }
 
     if (dto.name !== undefined) user.name = dto.name
@@ -73,15 +86,14 @@ export class UserService {
     return this.serialize(user)
   }
 
-  async delete(companyId: string, actor: { id: string; name?: string }, userId: string) {
+  async delete(companyId: string, actor: UserActor, userId: string) {
     const user = await UserModel.findOne({ _id: userId, companyId })
     if (!user) {
       throw AppError.notFound('User not found', 'NOT_FOUND')
     }
 
-    if (user.role === 'owner') {
-      throw AppError.forbidden('Cannot modify the company owner via this endpoint', 'FORBIDDEN')
-    }
+    // Actors may only deactivate users strictly below their own rank.
+    assertCanActOnUserRole(actor.role, user.role)
 
     user.isActive = false
     await user.save()
