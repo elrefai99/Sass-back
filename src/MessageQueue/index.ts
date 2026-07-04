@@ -31,7 +31,7 @@ const startWorkerServer = async () => {
           ]).then(() => {
                require('./worker.emails');
                require('./worker.notifications');
-               console.log('⛁  Success connected with MongoDB of SRVJ for workers');
+               console.log('⛁  Success connected with MongoDB of SwakipOS for workers');
                console.log('🚀 All workers started successfully!');
           })
      } catch (error: any) {

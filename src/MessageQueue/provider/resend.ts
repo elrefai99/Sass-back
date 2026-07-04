@@ -6,7 +6,7 @@ export const resendFunction = async (to: string, html: string, subject: string, 
      const resend = new Resend(process.env.RESEND_API as string);
      try {
           const { data, error } = await resend.emails.send({
-               from: `SRVJ <srvj${type == "auth" ? ".auth" : type == "invite" ? ".invite" : type == "user" ? ".user" : ""}@elrefai.me>`,
+               from: `SwakipOS <SwakipOS${type == "auth" ? ".auth" : type == "invite" ? ".invite" : type == "user" ? ".user" : ""}@elrefai.me>`,
                to,
                subject,
                html,

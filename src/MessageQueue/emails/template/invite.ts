@@ -63,14 +63,14 @@ export const inviteTemp = (payload: IPayload_invite) => {
           <!-- Brand -->
        <tr>
             <td align="center" style="padding:0 0 28px 0;">
-              <!-- Inline SVG: renders in browser preview + Apple Mail. Gmail/Outlook strip it, so the SRVJ wordmark stays as fallback. -->
+              <!-- Inline SVG: renders in browser preview + Apple Mail. Gmail/Outlook strip it, so the SwakipOS wordmark stays as fallback. -->
               <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">
                 <tr>
                   <td style="vertical-align:middle; padding-right:12px; line-height:0; font-size:0;">
-                    <img src="https://res.cloudinary.com/cs74as-sjoaaaaaaaaaaaadsa/image/upload/v1782020694/SRVJ/favicon_le87qf.png" width="40" height="40" alt="SRVJ" style="display:block; width:40px; height:40px; border:0; outline:none; text-decoration:none;">
+                    <img src="https://res.cloudinary.com/cs74as-sjoaaaaaaaaaaaadsa/image/upload/v1782020694/SwakipOS/favicon_le87qf.png" width="40" height="40" alt="SwakipOS" style="display:block; width:40px; height:40px; border:0; outline:none; text-decoration:none;">
                   </td>
                   <td style="vertical-align:middle;">
-                    <span style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; letter-spacing:6px; color:#fafafa;">SRVJ</span>
+                    <span style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; letter-spacing:6px; color:#fafafa;">SwakipOS</span>
                   </td>
                 </tr>
               </table>
@@ -93,7 +93,7 @@ export const inviteTemp = (payload: IPayload_invite) => {
                 <tr>
                   <td class="px" style="padding:16px 40px 0 40px;">
                     <p class="text-secondary" style="margin:0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:15px; line-height:24px; color:#a1a1aa;">
-                      Hi ${firstName}, ${inviterName} invited you to join a whiteboard on SRVJ. Open it to start collaborating in real time.
+                      Hi ${firstName}, ${inviterName} invited you to join a whiteboard on SwakipOS. Open it to start collaborating in real time.
                     </p>
                   </td>
                 </tr>
@@ -175,10 +175,10 @@ export const inviteTemp = (payload: IPayload_invite) => {
           <tr>
             <td style="padding:28px 24px 0 24px;">
               <p style="margin:0 0 6px 0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; line-height:18px; color:#52525b; text-align:center;">
-                You received this email because ${inviterName} invited you to collaborate on SRVJ. If you weren't expecting this, you can safely ignore it.
+                You received this email because ${inviterName} invited you to collaborate on SwakipOS. If you weren't expecting this, you can safely ignore it.
               </p>
               <p style="margin:0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; line-height:18px; color:#52525b; text-align:center;">
-                &copy; ${new Date().getFullYear()} SRVJ. All rights reserved.
+                &copy; ${new Date().getFullYear()} SwakipOS. All rights reserved.
               </p>
             </td>
           </tr>

@@ -16,7 +16,7 @@ export const newEmployeeTemp = (payload: IPayload_newEmployee) => {
   <meta name="x-apple-disable-message-reformatting">
   <meta name="color-scheme" content="dark">
   <meta name="supported-color-schemes" content="dark">
-  <title>Your SRVJ account is ready</title>
+  <title>Your SwakipOS account is ready</title>
   <!--[if mso]>
   <noscript>
     <xml>
@@ -49,7 +49,7 @@ export const newEmployeeTemp = (payload: IPayload_newEmployee) => {
 
   <!-- Preheader -->
   <div style="display:none; font-size:1px; color:#0a0a0b; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">
-    Your SRVJ account has been created. Here are your sign-in details.&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    Your SwakipOS account has been created. Here are your sign-in details.&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
   <table role="presentation" class="body-bg" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0b;">
@@ -65,10 +65,10 @@ export const newEmployeeTemp = (payload: IPayload_newEmployee) => {
               <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">
                 <tr>
                   <td style="vertical-align:middle; padding-right:12px; line-height:0; font-size:0;">
-                    <img src="https://res.cloudinary.com/cs74as-sjoaaaaaaaaaaaadsa/image/upload/v1782020694/SRVJ/favicon_le87qf.png" width="40" height="40" alt="SRVJ" style="display:block; width:40px; height:40px; border:0; outline:none; text-decoration:none;">
+                    <img src="https://res.cloudinary.com/cs74as-sjoaaaaaaaaaaaadsa/image/upload/v1782020694/SwakipOS/favicon_le87qf.png" width="40" height="40" alt="SwakipOS" style="display:block; width:40px; height:40px; border:0; outline:none; text-decoration:none;">
                   </td>
                   <td style="vertical-align:middle;">
-                    <span style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; letter-spacing:6px; color:#fafafa;">SRVJ</span>
+                    <span style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; letter-spacing:6px; color:#fafafa;">SwakipOS</span>
                   </td>
                 </tr>
               </table>
@@ -131,12 +131,12 @@ export const newEmployeeTemp = (payload: IPayload_newEmployee) => {
                           <!--[if mso]>
                           <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${payload.loginUrl}" style="height:48px;v-text-anchor:middle;width:180px;" arcsize="20%" strokecolor="#6366f1" fillcolor="#6366f1">
                           <w:anchorlock/>
-                          <center style="color:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:600;">Sign in to SRVJ</center>
+                          <center style="color:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:600;">Sign in to SwakipOS</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
                           <a href="${payload.loginUrl}" target="_blank" style="display:inline-block; padding:14px 32px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:15px; font-weight:600; color:#ffffff; background-color:#6366f1; border-radius:10px;">
-                            Sign in to SRVJ
+                            Sign in to SwakipOS
                           </a>
                           <!--<![endif]-->
                         </td>
@@ -162,10 +162,10 @@ export const newEmployeeTemp = (payload: IPayload_newEmployee) => {
           <tr>
             <td style="padding:28px 24px 0 24px;">
               <p style="margin:0 0 6px 0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; line-height:18px; color:#52525b; text-align:center;">
-                You received this email because an account was created for you on SRVJ. Keep your password private and do not share it with anyone.
+                You received this email because an account was created for you on SwakipOS. Keep your password private and do not share it with anyone.
               </p>
               <p style="margin:0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; line-height:18px; color:#52525b; text-align:center;">
-                &copy; ${new Date().getFullYear()} SRVJ. All rights reserved.
+                &copy; ${new Date().getFullYear()} SwakipOS. All rights reserved.
               </p>
             </td>
           </tr>

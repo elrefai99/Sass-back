@@ -12,7 +12,7 @@ export const verifyEmailTemp = (payload: IPayload_verifyEmail) => {
   <meta name="x-apple-disable-message-reformatting">
   <meta name="color-scheme" content="dark">
   <meta name="supported-color-schemes" content="dark">
-  <title>Verify your SRVJ email</title>
+  <title>Verify your SwakipOS email</title>
   <style>
     :root { color-scheme: dark; supported-color-schemes: dark; }
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }

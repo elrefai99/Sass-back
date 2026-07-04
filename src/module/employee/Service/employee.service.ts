@@ -195,7 +195,7 @@ export class EmployeeService {
       await addJobToQueue('sendEmail', {
         type: 'newEmployee',
         email: employee.email,
-        subject: 'Your SRVJ account is ready',
+        subject: 'Your SwakipOS account is ready',
         emailBody: {
           firstName: employee.name,
           companyName: company?.name,
@@ -242,10 +242,10 @@ export class EmployeeService {
       departmentId: department ? idOf(department) : employee.departmentId?.toString(),
       department: department
         ? {
-            id: idOf(department),
-            name: department.name,
-            color: department.color,
-          }
+          id: idOf(department),
+          name: department.name,
+          color: department.color,
+        }
         : null,
       role: employee.role,
       systemRole: employee.systemRole,

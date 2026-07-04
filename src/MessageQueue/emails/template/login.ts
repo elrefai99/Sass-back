@@ -16,7 +16,7 @@ export const loginTemp = (payload: IPayload_login) => {
   <meta name="x-apple-disable-message-reformatting">
   <meta name="color-scheme" content="dark">
   <meta name="supported-color-schemes" content="dark">
-  <title>New sign-in to your SRVJ account</title>
+  <title>New sign-in to your SwakipOS account</title>
   <!--[if mso]>
   <noscript>
     <xml>
@@ -48,7 +48,7 @@ export const loginTemp = (payload: IPayload_login) => {
   <img src="${process.env.API_LINK}/api/v1/emails/opened?uuid=${payload.uuid}" width="1" height="1" alt="" style="display:none;">
 
   <div style="display:none; font-size:1px; color:#0a0a0b; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">
-    A new sign-in to your SRVJ account was detected. Review the details to confirm it was you.&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    A new sign-in to your SwakipOS account was detected. Review the details to confirm it was you.&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
   <table role="presentation" class="body-bg" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0b;">
@@ -61,18 +61,18 @@ export const loginTemp = (payload: IPayload_login) => {
           <!-- Brand -->
           <tr>
             <td align="center" style="padding:0 0 28px 0;">
-              <!-- Inline SVG: renders in browser preview + Apple Mail. Gmail / Outlook strip it, so the SRVJ wordmark stays as fallback. -->
+              <!-- Inline SVG: renders in browser preview + Apple Mail. Gmail / Outlook strip it, so the SwakipOS wordmark stays as fallback. -->
               <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">
                 <tr>
                   <td style="vertical-align:middle; padding-right:12px; line-height:0; font-size:0;">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SRVJ">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SwakipOS">
                       <rect x="3" y="3" width="6" height="6" rx="1" />
                       <rect x="15" y="15" width="6" height="6" rx="1" />
                       <path d="M9 6h6a3 3 0 0 1 3 3v6" />
                     </svg>
                   </td>
                   <td style="vertical-align:middle;">
-                    <span style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; letter-spacing:6px; color:#fafafa;">SRVJ</span>
+                    <span style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; letter-spacing:6px; color:#fafafa;">SwakipOS</span>
                   </td>
                 </tr>
               </table>
@@ -95,7 +95,7 @@ export const loginTemp = (payload: IPayload_login) => {
                 <tr>
                   <td class="px" style="padding:16px 40px 0 40px;">
                     <p class="text-secondary" style="margin:0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:15px; line-height:24px; color:#a1a1aa;">
-                      Hi ${firstName}, we noticed a new sign-in to your SRVJ account. If this was you, you can safely ignore this email.
+                      Hi ${firstName}, we noticed a new sign-in to your SwakipOS account. If this was you, you can safely ignore this email.
                     </p>
                   </td>
                 </tr>
@@ -181,7 +181,7 @@ export const loginTemp = (payload: IPayload_login) => {
                 This is a security notification and cannot be unsubscribed from.
               </p>
               <p style="margin:0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; line-height:18px; color:#52525b; text-align:center;">
-                &copy; ${new Date().getFullYear()} SRVJ. All rights reserved.
+                &copy; ${new Date().getFullYear()} SwakipOS. All rights reserved.
               </p>
             </td>
           </tr>

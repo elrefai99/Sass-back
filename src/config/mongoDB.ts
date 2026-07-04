@@ -16,7 +16,7 @@ export const mongoDBConfig = async (retries = 5): Promise<void> => {
      const uri = process.env.MONGODB_URI as string
      try {
           await connect(uri, { serverSelectionTimeoutMS: 5000 });
-          console.log('✅ Success connected with MongoDB of SRVJ')
+          console.log('✅ Success connected with MongoDB of SwakipOS')
           console.log('ɪᴘ My IP Address:', getLocalIP());
      } catch (err) {
           if (retries > 0) {
