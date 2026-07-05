@@ -4,7 +4,7 @@ import type { RequestUploadUrlDTO } from '../DTO/index.dto'
 
 export class UploadService {
   requestUploadUrl(companyId: string, dto: RequestUploadUrlDTO) {
-    const folder = `${process.env.CLOUDINARY_UPLOAD_FOLDER || 'nexora'}/${companyId}/${dto.purpose}`
+    const folder = `${process.env.CLOUDINARY_UPLOAD_FOLDER || 'SwakipOS'}/${companyId}/${dto.purpose}`
     const publicId = generateUUID()
     const timestamp = Math.round(Date.now() / 1000)
     const expiresAt = new Date((timestamp + 5 * 60) * 1000)

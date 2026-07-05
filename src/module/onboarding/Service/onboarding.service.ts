@@ -130,7 +130,7 @@ export class OnboardingService {
       await addJobToQueue('sendEmail', {
         type: 'invite',
         email,
-        subject: 'You are invited to Nexora ERP',
+        subject: 'You are invited to SwakipOS ERP',
         emailBody: { token },
       })
     } catch {

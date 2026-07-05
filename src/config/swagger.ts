@@ -4,9 +4,9 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.3',
     info: {
-      title: 'Nexora ERP API',
+      title: 'SwakipOS ERP API',
       version: process.env.npm_package_version || '1.0.0',
-      description: 'Modular-monolith backend API for the Nexora ERP MVP.',
+      description: 'Modular-monolith backend API for the SwakipOS ERP MVP.',
     },
     servers: [
       {

@@ -93,7 +93,7 @@ export class AuthenticationService {
 
     const tokens = await this.createSession(user, client)
 
-    await this.queueEmail('register', user.email, 'Welcome to Nexora ERP', {
+    await this.queueEmail('register', user.email, 'Welcome to SwakipOS ERP', {
       name: user.name,
       company: company.name,
     })
@@ -139,7 +139,7 @@ export class AuthenticationService {
     }
 
     const tokens = await this.createSession(user, client)
-    await this.queueEmail('login', user.email, 'New login to Nexora ERP', { name: user.name })
+    await this.queueEmail('login', user.email, 'New login to SwakipOS ERP', { name: user.name })
     await writeActivity({
       companyId: user.companyId.toString(),
       actorId: idOf(user),
@@ -241,7 +241,7 @@ export class AuthenticationService {
       expiresAt: addDays(new Date(), 1 / 24),
     })
 
-    await this.queueEmail('forgatePassword', user.email, 'Reset your Nexora ERP password', {
+    await this.queueEmail('forgatePassword', user.email, 'Reset your SwakipOS ERP password', {
       name: user.name,
       token,
     })
@@ -327,7 +327,7 @@ export class AuthenticationService {
     }
 
     const tokens = await this.createSession(user, client)
-    await this.queueEmail('register', user.email, 'Welcome to Nexora ERP', {
+    await this.queueEmail('register', user.email, 'Welcome to SwakipOS ERP', {
       name: user.name,
       company: company.name,
     })
@@ -389,7 +389,7 @@ export class AuthenticationService {
     })
 
     const siteUrl = process.env.SITE_URL_LIVE || process.env.SITE_URL_TEST || process.env.API_LINK || ''
-    await this.queueEmail('verifyEmail', user.email, 'Verify your Nexora ERP email', {
+    await this.queueEmail('verifyEmail', user.email, 'Verify your SwakipOS ERP email', {
       firstName: user.name,
       expiresIn: '3 days',
       verifyUrl: `${siteUrl.replace(/\/$/, '')}/verify-email?token=${token}`,
