@@ -1,6 +1,5 @@
 import { Job } from "bullmq";
 import { loginTemp } from "../template/login";
-import { registerTemp } from "../template/register";
 import { resendFunction } from "../../../MessageQueue/provider/resend";
 import { generateUUID } from "../../../utils/uuid";
 import { inviteTemp } from "../template/invite";
@@ -16,9 +15,6 @@ export const sendEmail = async (data: any) => {
           switch (data.type) {
                case "login":
                     await resendFunction(data.email, loginTemp(data.emailBody), data.subject, uuid, "auth")
-                    break;
-               case "register":
-                    await resendFunction(data.email, registerTemp(data.emailBody), data.subject, uuid, "auth")
                     break;
                case "invite":
                     await resendFunction(data.email, inviteTemp(data.emailBody), data.subject, uuid, "invite")
