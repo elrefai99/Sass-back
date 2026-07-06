@@ -19,7 +19,7 @@ const targets: LoggerOptions['transport'] = {
       : isDev
         ? [
           {
-            target: 'pino-pretty',
+            target: 'pino/file',
             level: 'debug',
             options: {
               colorize: true,

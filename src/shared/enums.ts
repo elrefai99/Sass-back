@@ -46,12 +46,22 @@ export const NOTIFICATION_TYPES = [
   'employee_joined',
   'billing',
   'attendance',
+  'chat_message',
   'system',
 ] as const
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
 
 export const INVITATION_STATUSES = ['pending', 'accepted', 'expired', 'revoked'] as const
 export type InvitationStatus = (typeof INVITATION_STATUSES)[number]
+
+export const CONVERSATION_TYPES = ['dm', 'group'] as const
+export type ConversationType = (typeof CONVERSATION_TYPES)[number]
+
+export const CONVERSATION_MEMBER_ROLES = ['member', 'admin'] as const
+export type ConversationMemberRole = (typeof CONVERSATION_MEMBER_ROLES)[number]
+
+export const MESSAGE_TYPES = ['text', 'system'] as const
+export type MessageType = (typeof MESSAGE_TYPES)[number]
 
 export const PROJECT_STATUSES = ['planning', 'active', 'on_hold', 'completed', 'archived'] as const
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number]
