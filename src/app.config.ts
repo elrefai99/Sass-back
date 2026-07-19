@@ -88,9 +88,7 @@ export default (app: Application) => {
   )
   app.use(cookieParser())
   app.use('/v0/cdn', express.static('cdn'))
-  if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'))
-  }
+  app.use(morgan('dev'))
   app.use(useragent.express())
   app.set('trust proxy', 1)
   app.use(async (req: Request | any, res: Response, next: NextFunction) => {
