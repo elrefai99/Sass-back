@@ -19,6 +19,7 @@ import teamModule from './module/team/team.module'
 import projectModule from './module/project/project.module'
 import auditLogModule from './module/audit-log/audit-log.module'
 import chatModule from './module/chat/chat.module'
+import analyticsModule from './module/analytics/analytics.module'
 
 export default (app: Application) => {
      app.use('/api/v1/auth', authModule)
@@ -42,4 +43,5 @@ export default (app: Application) => {
      app.use('/api/v1/uploads', uploadModule)
      app.use('/api/v1/audit-logs', auditLogModule)
      app.use('/api/v1/chat', chatModule)
+     app.use('/api/v1/analytics', analyticsModule)
 }

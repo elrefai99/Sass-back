@@ -66,6 +66,9 @@ export type MessageType = (typeof MESSAGE_TYPES)[number]
 export const PROJECT_STATUSES = ['planning', 'active', 'on_hold', 'completed', 'archived'] as const
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number]
 
+export const DEVICE_TYPES = ['desktop', 'mobile', 'tablet', 'bot', 'unknown'] as const
+export type DeviceType = (typeof DEVICE_TYPES)[number]
+
 export const roleRank: Record<SystemRole, number> = {
   employee: 1,
   manager: 2,

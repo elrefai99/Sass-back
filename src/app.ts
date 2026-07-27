@@ -38,6 +38,7 @@ import { redisConfig } from './config/redis'
 import { mongoDBConfig } from './config/mongoDB'
 import { swaggerSpec } from './config/swagger'
 import { errorHandler } from './utils/errors/errorHandler'
+import { trackAnalytics } from './module/analytics/middleware/track.middleware'
 
 const app: Express = express()
 
@@ -50,6 +51,7 @@ export let ioSocket: SocketIOServer = new SocketIOServer(server, {
 })
 
 appConfig(app)
+app.use(trackAnalytics)
 appModule(app)
 
 // Health check

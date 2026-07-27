@@ -31,6 +31,7 @@ const startWorkerServer = async () => {
           ]).then(() => {
                require('./worker.emails');
                require('./worker.notifications');
+               require('./worker.analytics');
                console.log('⛁  Success connected with MongoDB of SwakipOS for workers');
                console.log('🚀 All workers started successfully!');
           })
