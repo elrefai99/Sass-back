@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm build",
+  "framework": null,
+  "buildCommand": "tsc -p tsconfig.build.json",
   "outputDirectory": "public",
+  "installCommand": "pnpm install --frozen-lockfile",
   "functions": {
     "api/index.ts": {
       "memory": 1024,
