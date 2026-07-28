@@ -16,7 +16,15 @@ import { connectMongo } from '../src/config/mongoDB'
  */
 const REQUIRED_VARS = ['JWT_ACCESS_SECRET', 'MONGODB_URI'] as const
 
-const app = createApp()
+/**
+ * An Express app *is* a `(req, res)` request listener at runtime, but the call
+ * signature only exists on some resolutions of the Express types (Vercel's
+ * build type-checks against its own, where `Express` reads as non-callable),
+ * so the app is narrowed to the raw Node listener shape it actually is.
+ */
+type RequestListener = (req: IncomingMessage, res: ServerResponse) => void
+
+const app = createApp() as unknown as RequestListener
 
 /** Reachable even when the env or the database is broken, so a bad deploy is diagnosable. */
 const NO_DB_ROUTES = ['/api/health', '/api/docs', '/api/docs.json', '/metrics']
@@ -24,7 +32,7 @@ const NO_DB_ROUTES = ['/api/health', '/api/docs', '/api/docs.json', '/metrics']
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
      const path = (req.url ?? '').split('?')[0] ?? ''
      if (NO_DB_ROUTES.some((route) => path === route || path.startsWith(`${route}/`))) {
-          app(req as any, res as any)
+          app(req, res)
           return
      }
 
@@ -58,5 +66,5 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
           return
      }
 
-     app(req as any, res as any)
+     app(req, res)
 }
