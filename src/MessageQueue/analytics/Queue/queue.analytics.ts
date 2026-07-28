@@ -7,6 +7,10 @@ export const analyticsQueue = new Queue<AnalyticsEventInput>('analyticsQueue', {
   },
 })
 
+// Without a listener, an unreachable Redis emits an unhandled 'error' and takes
+// the process (or serverless invocation) down.
+analyticsQueue.on('error', (err) => console.error('analyticsQueue error:', err.message))
+
 const REMOVE_CONFIG = {
   removeOnComplete: {
     age: 60 * 60,

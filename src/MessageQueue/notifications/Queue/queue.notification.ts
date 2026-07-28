@@ -14,6 +14,10 @@ export const notificationQueue = new Queue<CreateNotificationJob>('notificationQ
   },
 })
 
+// Without a listener, an unreachable Redis emits an unhandled 'error' and takes
+// the process (or serverless invocation) down. Callers fall back on their own.
+notificationQueue.on('error', (err) => console.error('notificationQueue error:', err.message))
+
 const REMOVE_CONFIG = {
   removeOnComplete: {
     age: 60 * 60,

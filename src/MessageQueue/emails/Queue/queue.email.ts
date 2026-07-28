@@ -6,6 +6,10 @@ export const queue = new Queue("emailQueue", {
      },
 });
 
+// Without a listener, an unreachable Redis emits an unhandled 'error' and takes
+// the process (or serverless invocation) down.
+queue.on('error', (err) => console.error('emailQueue error:', err.message));
+
 const REMOVE_CONFIG = {
      removeOnComplete: {
           age: 60 * 60,

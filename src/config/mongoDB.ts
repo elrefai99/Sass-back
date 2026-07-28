@@ -1,5 +1,36 @@
-import { connect } from "mongoose"
+import mongoose, { connect } from "mongoose"
 import os from 'node:os';
+
+/**
+ * Serverless-safe connection.
+ *
+ * A Vercel function may be re-invoked on a warm container, so the connection
+ * promise is cached on `globalThis` to survive module re-evaluation, and a
+ * failure never calls `process.exit` (that surfaces as an opaque
+ * FUNCTION_INVOCATION_FAILED instead of a readable error).
+ */
+type MongoCache = { promise: Promise<typeof mongoose> | null }
+const globalCache = globalThis as typeof globalThis & { __mongoCache?: MongoCache }
+const cache: MongoCache = (globalCache.__mongoCache ??= { promise: null })
+
+export const connectMongo = async (): Promise<void> => {
+     if (mongoose.connection.readyState === 1) return
+
+     const uri = process.env.MONGODB_URI
+     if (!uri) throw new Error('MONGODB_URI is not set')
+
+     cache.promise ??= connect(uri, {
+          serverSelectionTimeoutMS: 8000,
+          maxPoolSize: 5,
+     })
+
+     try {
+          await cache.promise
+     } catch (err) {
+          cache.promise = null
+          throw err
+     }
+}
 
 function getLocalIP(): any {
      const interfaces = os.networkInterfaces();
