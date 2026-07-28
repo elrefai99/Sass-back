@@ -19,7 +19,7 @@ const REQUIRED_VARS = ['JWT_ACCESS_SECRET', 'MONGODB_URI'] as const
 const app = createApp()
 
 /** Reachable even when the env or the database is broken, so a bad deploy is diagnosable. */
-const NO_DB_ROUTES = ['/api/health', '/api/docs', '/metrics']
+const NO_DB_ROUTES = ['/api/health', '/api/docs', '/api/docs.json', '/metrics']
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
      const path = (req.url ?? '').split('?')[0] ?? ''
